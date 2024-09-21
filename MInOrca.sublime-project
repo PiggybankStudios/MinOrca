@@ -2,7 +2,23 @@
 	"folders":
 	[
 		{
-			"path": "."
+			"path": ".",
+			"folder_exclude_patterns": [
+				"lib/include/*",
+				"build/MinOrca",
+				"Release/*",
+			],
+			"file_exclude_patterns": [
+				"*.wasm",
+				"*.zip",
+			],
+		},
+		{
+			"name": "GyLib",
+			"path": "./lib/include/gylib",
+			"folder_exclude_patterns": [
+				"test",
+			],
 		}
 	]
 }
