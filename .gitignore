@@ -1,0 +1,5 @@
+build/*
+!build/build.bat
+lib/include/*
+!lib/include/README.md
+*.sublime-workspace
