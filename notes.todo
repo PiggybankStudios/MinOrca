@@ -1,0 +1,13 @@
+
+# TODO List
+	[ ] Get an image loading and rendering
+	[ ] Get a piece of audio loading and rendering
+	[ ] Render some sort of vector geometry?
+	[ ] Get timing information and set up TimeScale, etc.
+	[ ] 
+
+# Questions
+	[ ] Can we get hot-reloading working in Orca somehow?
+	[ ] What does "setlocal enabledelayedexpansion" do?
+	[ ] Vector, Rectangle, and Color types need to be aliased and extended? Or maybe we should use my own vector/rect types?
+	[ ] 
