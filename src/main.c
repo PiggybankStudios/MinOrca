@@ -15,6 +15,7 @@ Description:
 oc_surface surface;
 oc_canvas_renderer renderer;
 oc_canvas_context canvasContext;
+oc_vec2 mousePos;
 
 ORCA_EXPORT void oc_on_init()
 {
@@ -49,6 +50,12 @@ ORCA_EXPORT void oc_on_key_up(oc_scan_code scan, oc_key_code key)
 	//TODO: Implement me!
 }
 
+ORCA_EXPORT void oc_on_mouse_move(float x, float y, float dx, float dy)
+{
+    mousePos.x = x;
+    mousePos.y = y;
+}
+
 ORCA_EXPORT void oc_on_frame_refresh()
 {
 	oc_arena_scope scratch = oc_scratch_begin();
@@ -58,7 +65,15 @@ ORCA_EXPORT void oc_on_frame_refresh()
     oc_clear();
     
     oc_set_color_rgba(0xF2/255.0f, 0x7C/255.0f, 0xB1/255.0f, 1); //FFF27CB1
-    oc_rounded_rectangle_fill(10, 10, 100, 200, 15);
+    oc_rounded_rectangle_fill(mousePos.x, mousePos.y, 100, 200, 15);
+    
+    oc_circle_fill(mousePos.x - 50 + 15, mousePos.y - 50 + 15, 50);
+    
+    oc_set_color_rgba(0xF8/255.0f, 0x33/255.0f, 0x33/255.0f, 1); //0xFFF83333
+    oc_set_width(20);
+    oc_move_to(100, 100);
+    oc_cubic_to(100, 100, mousePos.x, mousePos.y, 200, 100);
+    oc_stroke();
     
     oc_canvas_render(renderer, canvasContext, surface);
     oc_canvas_present(renderer, surface);

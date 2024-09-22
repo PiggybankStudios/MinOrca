@@ -15,10 +15,27 @@
 		},
 		{
 			"name": "GyLib",
-			"path": "./lib/include/gylib",
+			"path": "lib/include/gylib",
 			"folder_exclude_patterns": [
 				"test",
 			],
-		}
+			"file_exclude_patterns": [
+				"*.sublime-project",
+			],
+		},
+		{
+			"name": "Orca Docs",
+			"path": "lib/include/orca/doc/",
+			"folder_exclude_patterns": [
+				"mkdocs/docs",
+			],
+		},
+		{
+			"name": "Orca Headers",
+			"path": "lib/include/orca/src/",
+			"file_include_patterns": [
+				"*.h",
+			],
+		},
 	]
 }
