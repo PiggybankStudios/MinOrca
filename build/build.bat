@@ -19,7 +19,7 @@ set DataFolder=../data
 set LibFolder=../lib
 set AppIconPath=%DataFolder%/icon.png
 set OutputWasmModulePath=module.wasm
-set MainSourcePath=%SourceFolder%/main.c
+set MainSourcePath=%SourceFolder%/main.cpp
 set BuildConfigPath=%SourceFolder%/build_config.h
 set ExtractDefineScriptPath=%LibFolder%/include/gylib/ExtractDefine.py
 
@@ -33,7 +33,10 @@ for /f "delims=" %%i in ('python %ExtractDefineScriptPath% %BuildConfigPath% DEB
 :: Main Flags
 :: --target=wasm32 = Output to wasm32 binary
 :: -mbuild-memory = Something about bulk memory operations like memset being opt-in instructions in wasm, this is how we make those functions compile to single instructions
-set CompilerFlags=--target=wasm32 -mbulk-memory
+:: -std=c++11 = ?
+:: -D__DEFINED_wchar_t = TODO: Why is this needed?? When compiling in C++ mode, we run into an error:
+::                             alltypes.h:116:13: error: cannot combine with previous 'int' declaration specifier
+set CompilerFlags=--target=wasm32 -mbulk-memory -std=c++11 -D__DEFINED_wchar_t
 :: Linker Flags
 :: -Wl,--no-entry = Allow no entry point in this compilation (Orca will act as the entry point, and it will use our wasm binary when we do orca bundle)
 :: -Wl,--export-dynamic = ?

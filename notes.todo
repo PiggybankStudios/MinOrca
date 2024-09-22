@@ -1,6 +1,6 @@
 
 # TODO List
-	[!] Rename the main.c to main.cpp and get things compiling in C++ mode!
+	[X] Rename the main.c to main.cpp and get things compiling in C++ mode!
 	[ ] Write the minimal number of aliases so our program looks a little more like home
 	[ ] Get an image loading and rendering
 	[ ] Get a piece of audio loading and rendering

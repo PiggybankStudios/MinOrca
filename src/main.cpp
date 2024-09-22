@@ -1,5 +1,5 @@
 /*
-File:   main.c
+File:   main.cpp
 Author: Taylor Robbins
 Date:   09\21\2024
 Description: 
@@ -9,6 +9,7 @@ Description:
 
 #include <math.h>
 #include <orca.h>
+
 #include "orca_aliases.h"
 
 #include "build_config.h"
