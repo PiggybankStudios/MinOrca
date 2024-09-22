@@ -1,13 +1,17 @@
 
 # TODO List
+	[!] Rename the main.c to main.cpp and get things compiling in C++ mode!
+	[ ] Write the minimal number of aliases so our program looks a little more like home
 	[ ] Get an image loading and rendering
 	[ ] Get a piece of audio loading and rendering
 	[ ] Render some sort of vector geometry?
 	[ ] Get timing information and set up TimeScale, etc.
+	[ ] What happens when we hit a breakpoint in remedybg? In VS? What about exceptions?
 	[ ] 
 
 # Questions
 	[ ] Can we get hot-reloading working in Orca somehow?
 	[ ] What does "setlocal enabledelayedexpansion" do?
 	[ ] Vector, Rectangle, and Color types need to be aliased and extended? Or maybe we should use my own vector/rect types?
+	[X] Why can't we use "inline" keyword? Are we somehow compiling with ourselves later or something?
 	[ ] 

@@ -37,5 +37,24 @@
 				"*.h",
 			],
 		},
-	]
+	],
+	"settings":
+	{
+		"build_options":
+		[
+		],
+		"custom_constants":
+		[
+			"INLINE"
+		],
+		"custom_functions":
+		[
+		],
+		"custom_globals":
+		[
+		],
+		"custom_types":
+		[
+		]
+	},
 }

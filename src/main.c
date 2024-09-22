@@ -9,13 +9,14 @@ Description:
 
 #include <math.h>
 #include <orca.h>
+#include "orca_aliases.h"
 
 #include "build_config.h"
 
 oc_surface surface;
 oc_canvas_renderer renderer;
 oc_canvas_context canvasContext;
-oc_vec2 mousePos;
+v2 mousePos;
 
 ORCA_EXPORT void oc_on_init()
 {
