@@ -22,6 +22,7 @@ Description:
 // +--------------------------------------------------------------+
 //NOTE: Clang treats basic "inline" a bit different than I expected, "static inline" does what I want
 #define INLINE static inline
+#define EXPORT ORCA_EXPORT
 
 // +--------------------------------------------------------------+
 // |                            Types                             |
@@ -184,16 +185,19 @@ typedef Matrix2x3_t mat23;
 union Rectangle_t
 {
 	oc_rect oc;
-	union
+	struct
 	{
-		v2 topLeft;
-		struct { r32 x, y; };
-		struct { r32 left, top; };
-	};
-	union
-	{
-		v2 size;
-		struct { r32 width, height; };
+		union
+		{
+			v2 topLeft;
+			struct { r32 x, y; };
+			struct { r32 left, top; };
+		};
+		union
+		{
+			v2 size;
+			struct { r32 width, height; };
+		};
 	};
 };
 typedef Rectangle_t rec;
@@ -270,6 +274,33 @@ INLINE rec NewRec(r32 x, r32 y, r32 width, r32 height)
 	result.y = y;
 	result.width = width;
 	result.height = height;
+	return result;
+}
+INLINE rec NewRec(v2 topLeft, r32 width, r32 height)
+{
+	rec result;
+	result.x = topLeft.x;
+	result.y = topLeft.y;
+	result.width = width;
+	result.height = height;
+	return result;
+}
+INLINE rec NewRec(r32 x, r32 y, v2 size)
+{
+	rec result;
+	result.x = x;
+	result.y = y;
+	result.width = size.width;
+	result.height = size.height;
+	return result;
+}
+INLINE rec NewRec(v2 topLeft, v2 size)
+{
+	rec result;
+	result.x = topLeft.x;
+	result.y = topLeft.y;
+	result.width = size.width;
+	result.height = size.height;
 	return result;
 }
 INLINE colf NewColorf(r32 r, r32 g, r32 b, r32 a)
@@ -676,9 +707,13 @@ INLINE void OC_Clear()                                                          
 INLINE void OC_Fill()                                                                                                                               { oc_fill(); }
 INLINE void OC_Stroke()                                                                                                                             { oc_stroke(); }
 INLINE void OC_RectangleFill(r32 x, r32 y, r32 w, r32 h)                                                                                            { oc_rectangle_fill(x, y, w, h); }
+INLINE void OC_RectangleFill(rec rectangle)                                                                                                         { oc_rectangle_fill(rectangle.x, rectangle.y, rectangle.width, rectangle.height); }
 INLINE void OC_RectangleStroke(r32 x, r32 y, r32 w, r32 h)                                                                                          { oc_rectangle_stroke(x, y, w, h); }
+INLINE void OC_RectangleStroke(rec rectangle)                                                                                                       { oc_rectangle_stroke(rectangle.x, rectangle.y, rectangle.width, rectangle.height); }
 INLINE void OC_RoundedRectangleFill(r32 x, r32 y, r32 w, r32 h, r32 r)                                                                              { oc_rounded_rectangle_fill(x, y, w, h, r); }
+INLINE void OC_RoundedRectangleFill(rec rectangle, r32 r)                                                                                           { oc_rounded_rectangle_fill(rectangle.x, rectangle.y, rectangle.width, rectangle.height, r); }
 INLINE void OC_RoundedRectangleStroke(r32 x, r32 y, r32 w, r32 h, r32 r)                                                                            { oc_rounded_rectangle_stroke(x, y, w, h, r); }
+INLINE void OC_RoundedRectangleStroke(rec rectangle, r32 r)                                                                                         { oc_rounded_rectangle_stroke(rectangle.x, rectangle.y, rectangle.width, rectangle.height, r); }
 INLINE void OC_EllipseFill(r32 x, r32 y, r32 rx, r32 ry)                                                                                            { oc_ellipse_fill(x, y, rx, ry); }
 INLINE void OC_EllipseStroke(r32 x, r32 y, r32 rx, r32 ry)                                                                                          { oc_ellipse_stroke(x, y, rx, ry); }
 INLINE void OC_CircleFill(r32 x, r32 y, r32 r)                                                                                                      { oc_circle_fill(x, y, r); }
@@ -823,6 +858,7 @@ INLINE bool OC_PathIsAbsolute(MyStr_t path)                                     
 /*
 @Defines
 INLINE
+EXPORT
 @Types
 Vec2_t
 v2

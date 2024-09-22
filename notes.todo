@@ -1,13 +1,16 @@
 
 # TODO List
 	[X] Rename the main.c to main.cpp and get things compiling in C++ mode!
-	[ ] Write the minimal number of aliases so our program looks a little more like home
-	[ ] Get an image loading and rendering
+	[X] Write the minimal number of aliases so our program looks a little more like home
+	[X] Get an image loading and rendering
 	[ ] Get a piece of audio loading and rendering
 	[ ] Render some sort of vector geometry?
 	[ ] Get timing information and set up TimeScale, etc.
 	[ ] What happens when we hit a breakpoint in remedybg? In VS? What about exceptions?
 	[ ] Add support for making an application that doesn't spawn a console window (Does the icon of the application window fix itself?)
+	[ ] Make sure all the parameter names are in our naming convention in orca_aliases.h
+	[ ] Add a version number for the application with an auto-incrementing build number!
+	[ ] Manage our memory a bit better (global struct for app state, allocations from a heap?, etc.)
 	[ ] 
 
 # Questions

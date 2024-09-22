@@ -18,50 +18,50 @@ OC_Surface_t surface;
 OC_CanvasRenderer_t renderer;
 OC_CanvasContext_t canvasContext;
 v2 mousePos;
+v2 ScreenSize;
+v2i ScreenSizei;
+rec ScreenRec;
+OC_Image_t pigTexture;
 
-ORCA_EXPORT void OC_OnInit()
+EXPORT void OC_OnInit()
 {
 	OC_Log_I("OC_OnInit!");
-	OC_Log_I("sizeof(size_t): %d", sizeof(size_t));
-	OC_Log_I("sizeof(oc_str8): %d", sizeof(oc_str8));
-	OC_Log_I("sizeof(MyStr_t): %d", sizeof(MyStr_t));
 	
 	OC_WindowSetTitle(NewStr(PROJECT_NAME_STR));
 	
 	renderer = OC_CanvasRendererCreate();
 	surface = OC_CanvasSurfaceCreate(renderer);
 	canvasContext = OC_CanvasContextCreate();
+	
+	pigTexture = OC_ImageCreateFromPath(renderer, NewStr("pig_invalid.png"), false);
+	OC_Assert(!OC_ImageIsNil(pigTexture), "Failed to load pig_invalid.png!");
 }
 
-ORCA_EXPORT void OC_OnTerminate()
+EXPORT void OC_OnResize(u32 width, u32 height)
 {
-	OC_Log_I("OC_OnTerminate!");
-	//TODO: Implement me!
+	// OC_Log_I("OC_OnResize(%d, %d)!", width, height);
+	ScreenSize = NewVec2((r32)width, (r32)height);
+	ScreenSizei = NewVec2i((i32)width, (i32)height);
+	ScreenRec = NewRec(0, 0, (r32)width, (r32)height);
 }
 
-ORCA_EXPORT void OC_OnResize(u32 width, u32 height)
-{
-	OC_Log_I("oc_on_resize(%d, %d)!", width, height);
-	//TODO: Implement me!
-}
-
-ORCA_EXPORT void OC_OnKeyDown(oc_scan_code scan, oc_key_code key)
-{
-	//TODO: Implement me!
-}
-
-ORCA_EXPORT void OC_OnKeyUp(oc_scan_code scan, oc_key_code key)
+EXPORT void OC_OnKeyDown(OC_ScanCode_t scan, OC_KeyCode_t key)
 {
 	//TODO: Implement me!
 }
 
-ORCA_EXPORT void OC_OnMouseMove(float x, float y, float dx, float dy)
+EXPORT void OC_OnKeyUp(OC_ScanCode_t scan, OC_KeyCode_t key)
+{
+	//TODO: Implement me!
+}
+
+EXPORT void OC_OnMouseMove(float x, float y, float dx, float dy)
 {
 	mousePos.x = x;
 	mousePos.y = y;
 }
 
-ORCA_EXPORT void OC_OnFrameRefresh()
+EXPORT void OC_OnFrameRefresh()
 {
 	OC_ArenaScope_t scratch = OC_ScratchBegin();
 	
@@ -69,10 +69,17 @@ ORCA_EXPORT void OC_OnFrameRefresh()
 	OC_SetColorRgba(NewColorfHex(0xFFCC3B95));
 	OC_Clear();
 	
-	OC_SetColorRgba(NewColorfHex(0xFFF27CB1));
-	OC_RoundedRectangleFill(mousePos.x, mousePos.y, 100, 200, 15);
+	OC_SetColorRgba(NewColorfHex(0xFF222222));
+	// OC_ImageDraw(pigTexture, ScreenRec); //TODO: Color doesn't matter for OC_ImageDraw?
+	OC_SetImage(pigTexture);
+	OC_RectangleFill(ScreenRec);
 	
-	OC_CircleFill(mousePos.x - 50 + 15, mousePos.y - 50 + 15, 50);
+	OC_SetColorRgba(NewColorfHex(0xFFF27CB1));
+	OC_SetImage(pigTexture);
+	OC_RoundedRectangleFill(NewRec(mousePos.x, mousePos.y, 100, 200), 25);
+	OC_SetImage(OC_ImageNil());
+	
+	OC_CircleFill(mousePos.x - 50 + 25, mousePos.y - 50 + 25, 50);
 	
 	OC_SetColorRgba(NewColorfHex(0xFFF83333));
 	OC_SetWidth(20);
@@ -85,4 +92,3 @@ ORCA_EXPORT void OC_OnFrameRefresh()
 	
 	OC_ScratchEnd(scratch);
 }
-
