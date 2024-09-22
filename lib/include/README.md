@@ -2,6 +2,10 @@ This folder should contain copies of all the include folders from libraries that
 
 The list of libraries is given below:
 
+# my_orca
+https://www.github.com/PiggybankStudios/my_orca
+my_orca folder
+
 # gylib
 https://www.github.com/PiggybankStudios/gylib
 gylib folder
