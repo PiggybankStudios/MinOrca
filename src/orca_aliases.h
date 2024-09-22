@@ -90,8 +90,8 @@ union MyStr_t
 	struct
 	{
 		union { char* pntr; char* chars; u8* bytes; };
+		u32 length; //NOTE: THis is actually size_t in oc_str8, but I'd rather deal with known 32-bit value until we actuall have WASM64 support
 	};
-	u32 length; //NOTE: THis is actually size_t in oc_str8, but I'd rather deal with known 32-bit value until we actuall have WASM64 support
 };
 typedef MyStr_t OC_Str8_t;
 //TODO: Can we choose a shorter alias that makes sense and doesn't conflict with standard library types?
@@ -272,14 +272,42 @@ INLINE rec NewRec(r32 x, r32 y, r32 width, r32 height)
 	result.height = height;
 	return result;
 }
+INLINE colf NewColorf(r32 r, r32 g, r32 b, r32 a)
+{
+	colf result;
+	result.r = r;
+	result.g = g;
+	result.b = b;
+	result.a = a;
+	return result;
+}
+INLINE colf NewColorfBytes(u8 r, u8 g, u8 b, u8 a)
+{
+	colf result;
+	result.r = (r32)r / 255.0f;
+	result.g = (r32)g / 255.0f;
+	result.b = (r32)b / 255.0f;
+	result.a = (r32)a / 255.0f;
+	return result;
+}
+INLINE colf NewColorfHex(u32 packedColorBgra)
+{
+	colf result;
+	result.r = (r32)((packedColorBgra & 0x000000FFUL) >>  0) / 255.0f;
+	result.g = (r32)((packedColorBgra & 0x0000FF00UL) >>  8) / 255.0f;
+	result.b = (r32)((packedColorBgra & 0x00FF0000UL) >> 16) / 255.0f;
+	result.a = (r32)((packedColorBgra & 0xFF000000UL) >> 24) / 255.0f;
+	return result;
+}
 
-INLINE MyStr_t ToStr(oc_str8 ocString) { return NewStr(ocString.len, ocString.ptr); }
-INLINE v2 ToVec2(oc_vec2 ocVector) { return NewVec2(ocVector.x, ocVector.y); }
-INLINE v3 ToVec3(oc_vec3 ocVector) { return NewVec3(ocVector.x, ocVector.y, ocVector.z); }
-INLINE v4 ToVec4(oc_vec4 ocVector) { return NewVec4(ocVector.x, ocVector.y, ocVector.z, ocVector.w); }
-INLINE v2i ToVec2i(oc_vec2i ocVector) { return NewVec2i(ocVector.x, ocVector.y); }
-INLINE rec ToRec(oc_rect ocRectangle) { return NewRec(ocRectangle.x, ocRectangle.y, ocRectangle.w, ocRectangle.h); }
-INLINE mat23 ToMat23(oc_mat2x3 ocMatrix) { return NewMat23(ocMatrix.m[0], ocMatrix.m[1], ocMatrix.m[2], ocMatrix.m[3], ocMatrix.m[4], ocMatrix.m[5]); }
+INLINE MyStr_t ToStr(oc_str8 ocString)     { return NewStr(ocString.len, ocString.ptr); }
+INLINE v2      ToVec2(oc_vec2 ocVector)    { return NewVec2(ocVector.x, ocVector.y); }
+INLINE v3      ToVec3(oc_vec3 ocVector)    { return NewVec3(ocVector.x, ocVector.y, ocVector.z); }
+INLINE v4      ToVec4(oc_vec4 ocVector)    { return NewVec4(ocVector.x, ocVector.y, ocVector.z, ocVector.w); }
+INLINE v2i     ToVec2i(oc_vec2i ocVector)  { return NewVec2i(ocVector.x, ocVector.y); }
+INLINE rec     ToRec(oc_rect ocRectangle)  { return NewRec(ocRectangle.x, ocRectangle.y, ocRectangle.w, ocRectangle.h); }
+INLINE mat23   ToMat23(oc_mat2x3 ocMatrix) { return NewMat23(ocMatrix.m[0], ocMatrix.m[1], ocMatrix.m[2], ocMatrix.m[3], ocMatrix.m[4], ocMatrix.m[5]); }
+INLINE colf    ToColorf(oc_color ocColor)  { return NewColorf(ocColor.r, ocColor.g, ocColor.b, ocColor.a); }
 
 // +===============================+
 // | Operator Overload Equivalents |
@@ -610,7 +638,9 @@ INLINE void OC_ClipPop()                                                        
 INLINE rec OC_ClipTop()                                                                                                                             { return ToRec(oc_clip_top()); }
 INLINE void OC_SetColor(oc_color color)                                                                                                             { oc_set_color(color); }
 INLINE void OC_SetColorRgba(r32 r, r32 g, r32 b, r32 a)                                                                                             { oc_set_color_rgba(r, g, b, a); }
+INLINE void OC_SetColorRgba(colf color)                                                                                                             { oc_set_color_rgba(color.r, color.g, color.b, color.a); }
 INLINE void OC_SetColorSrgba(r32 r, r32 g, r32 b, r32 a)                                                                                            { oc_set_color_srgba(r, g, b, a); }
+INLINE void OC_SetColorSrgba(colf color)                                                                                                            { oc_set_color_srgba(color.r, color.g, color.b, color.a); }
 INLINE void OC_SetGradient(OC_GradientBlendSpace_t blendSpace, oc_color bottomLeft, oc_color bottomRight, oc_color topRight, oc_color topLeft)      { oc_set_gradient(blendSpace, bottomLeft, bottomRight, topRight, topLeft); }
 INLINE void OC_SetWidth(r32 width)                                                                                                                  { oc_set_width(width); }
 INLINE void OC_SetTolerance(r32 tolerance)                                                                                                          { oc_set_tolerance(tolerance); }
@@ -815,12 +845,17 @@ INLINE v4 NewVec4(r32 x, r32 y, r32 z, r32 w)
 INLINE v2i NewVec2i(i32 x, i32 y)
 INLINE mat23 NewMat23(r32 r0c0, r32 r0c1, r32 r0c2, r32 r1c0, r32 r1c1, r32 r1c2)
 INLINE rec NewRec(r32 x, r32 y, r32 width, r32 height)
+INLINE colf NewColorf(r32 r, r32 g, r32 b, r32 a)
+INLINE colf NewColorfBytes(u8 r, u8 g, u8 b, u8 a)
+INLINE colf NewColorfHex(u32 packedColorBgra)
+INLINE MyStr_t ToStr(oc_str8 ocString)
 INLINE v2 ToVec2(oc_vec2 ocVector)
 INLINE v3 ToVec3(oc_vec3 ocVector)
 INLINE v4 ToVec4(oc_vec4 ocVector)
 INLINE v2i ToVec2i(oc_vec2i ocVector)
 INLINE rec ToRec(oc_rect ocRectangle)
 INLINE mat23 ToMat23(oc_mat2x3 ocMatrix)
+INLINE colf ToColorf(oc_color ocColor)
 INLINE v2 Vec2Add(v2 left, v2 right)
 INLINE v2 Vec2Subtract(v2 left, v2 right)
 INLINE v2 Vec2Scale(v2 vector, r32 scalar)
@@ -925,8 +960,8 @@ INLINE void OC_ClipPush(r32 x, r32 y, r32 w, r32 h)
 INLINE void OC_ClipPop()
 INLINE rec OC_ClipTop()
 INLINE void OC_SetColor(oc_color color)
-INLINE void OC_SetColorRgba(r32 r, r32 g, r32 b, r32 a)
-INLINE void OC_SetColorSrgba(r32 r, r32 g, r32 b, r32 a)
+INLINE void OC_SetColorRgba(colf color)
+INLINE void OC_SetColorSrgba(colf color)
 INLINE void OC_SetGradient(OC_GradientBlendSpace_t blendSpace, oc_color bottomLeft, oc_color bottomRight, oc_color topRight, oc_color topLeft)
 INLINE void OC_SetWidth(r32 width)
 INLINE void OC_SetTolerance(r32 tolerance)
