@@ -16,6 +16,7 @@ Description:
 
 #include "build_config.h"
 
+OC_Arena_t mainArena;
 AppState_t* app = nullptr;
 v2 MousePos = Vec2_Zero_Const;
 v2 ScreenSize = Vec2_Zero_Const;
@@ -29,8 +30,10 @@ EXPORT void OC_OnInit()
 {
 	OC_Log_I("OC_OnInit!");
 	
+	OC_ArenaInit(&mainArena);
+	
 	OC_WindowSetTitle(NewStr(PROJECT_NAME_STR));
-	app = (AppState_t*)malloc(sizeof(AppState_t));
+	app = OC_ArenaPushType(&mainArena, AppState_t);
 	OC_Assert(app != nullptr, "Failed to allocate AppState_t structure!!");
 	memset(app, 0x00, sizeof(AppState_t)); //TODO: Change to ClearPntr?
 	
@@ -41,6 +44,8 @@ EXPORT void OC_OnInit()
 	app->pigTexture = OC_ImageCreateFromPath(app->renderer, NewStr("Image/pig_invalid.png"), false);
 	OC_Assert(!OC_ImageIsNil(app->pigTexture), "Failed to load pig_invalid.png!");
 }
+
+//TODO: Should we call OC_ArenaCleanup on mainArena when the application is closing?
 
 // +==============================+
 // |         OC_OnResize          |
