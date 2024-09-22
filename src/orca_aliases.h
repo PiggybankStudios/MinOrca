@@ -293,10 +293,10 @@ INLINE colf NewColorfBytes(u8 r, u8 g, u8 b, u8 a)
 INLINE colf NewColorfHex(u32 packedColorBgra)
 {
 	colf result;
-	result.r = (r32)((packedColorBgra & 0x000000FFUL) >>  0) / 255.0f;
-	result.g = (r32)((packedColorBgra & 0x0000FF00UL) >>  8) / 255.0f;
-	result.b = (r32)((packedColorBgra & 0x00FF0000UL) >> 16) / 255.0f;
-	result.a = (r32)((packedColorBgra & 0xFF000000UL) >> 24) / 255.0f;
+	result.b = (r32)((packedColorBgra >>  0) & 0xFF) / 255.0f;
+	result.g = (r32)((packedColorBgra >>  8) & 0xFF) / 255.0f;
+	result.r = (r32)((packedColorBgra >> 16) & 0xFF) / 255.0f;
+	result.a = (r32)((packedColorBgra >> 24) & 0xFF) / 255.0f;
 	return result;
 }
 

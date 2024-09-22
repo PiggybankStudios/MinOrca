@@ -28,9 +28,9 @@ ORCA_EXPORT void OC_OnInit()
 	
 	OC_WindowSetTitle(NewStr(PROJECT_NAME_STR));
 	
-    renderer = OC_CanvasRendererCreate();
-    surface = OC_CanvasSurfaceCreate(renderer);
-    canvasContext = OC_CanvasContextCreate();
+	renderer = OC_CanvasRendererCreate();
+	surface = OC_CanvasSurfaceCreate(renderer);
+	canvasContext = OC_CanvasContextCreate();
 }
 
 ORCA_EXPORT void OC_OnTerminate()
@@ -57,8 +57,8 @@ ORCA_EXPORT void OC_OnKeyUp(oc_scan_code scan, oc_key_code key)
 
 ORCA_EXPORT void OC_OnMouseMove(float x, float y, float dx, float dy)
 {
-    mousePos.x = x;
-    mousePos.y = y;
+	mousePos.x = x;
+	mousePos.y = y;
 }
 
 ORCA_EXPORT void OC_OnFrameRefresh()
@@ -66,23 +66,23 @@ ORCA_EXPORT void OC_OnFrameRefresh()
 	OC_ArenaScope_t scratch = OC_ScratchBegin();
 	
 	OC_CanvasContextSelect(canvasContext);
-    OC_SetColorRgba(NewColorfBytes(0xCC, 0x3B, 0x95, 0xFF));
-    OC_Clear();
-    
-    OC_SetColorRgba(NewColorfBytes(0xF2, 0x7C, 0xB1, 0xFF));
-    OC_RoundedRectangleFill(mousePos.x, mousePos.y, 100, 200, 15);
-    
-    OC_CircleFill(mousePos.x - 50 + 15, mousePos.y - 50 + 15, 50);
-    
-    OC_SetColorRgba(NewColorfBytes(0xF8, 0x33, 0x33, 0xFF));
-    OC_SetWidth(20);
-    OC_MoveTo(100, 100);
-    OC_CubicTo(100, 100, mousePos.x, mousePos.y, 200, 100);
-    OC_Stroke();
-    
-    OC_CanvasRender(renderer, canvasContext, surface);
-    OC_CanvasPresent(renderer, surface);
-    
-    OC_ScratchEnd(scratch);
+	OC_SetColorRgba(NewColorfHex(0xFFCC3B95));
+	OC_Clear();
+	
+	OC_SetColorRgba(NewColorfHex(0xFFF27CB1));
+	OC_RoundedRectangleFill(mousePos.x, mousePos.y, 100, 200, 15);
+	
+	OC_CircleFill(mousePos.x - 50 + 15, mousePos.y - 50 + 15, 50);
+	
+	OC_SetColorRgba(NewColorfHex(0xFFF83333));
+	OC_SetWidth(20);
+	OC_MoveTo(100, 100);
+	OC_CubicTo(100, 100, mousePos.x, mousePos.y, 200, 100);
+	OC_Stroke();
+	
+	OC_CanvasRender(renderer, canvasContext, surface);
+	OC_CanvasPresent(renderer, surface);
+	
+	OC_ScratchEnd(scratch);
 }
 
