@@ -21,7 +21,9 @@ set AppIconPath=%DataFolder%/icon.png
 set OutputWasmModulePath=module.wasm
 set MainSourcePath=%SourceFolder%/main.cpp
 set BuildConfigPath=%SourceFolder%/build_config.h
+set VersionFilePath=%SourceFolder%/version.h
 set ExtractDefineScriptPath=%LibFolder%/include/gylib/ExtractDefine.py
+set IncVersNumScriptPath=%LibFolder%/include/gylib/IncrementVersionNumber.py
 
 for /f "delims=" %%i in ('python %ExtractDefineScriptPath% %BuildConfigPath% PROJECT_NAME')      do set PROJECT_NAME=%%i
 for /f "delims=" %%i in ('python %ExtractDefineScriptPath% %BuildConfigPath% PROJECT_NAME_SAFE') do set PROJECT_NAME_SAFE=%%i
@@ -64,6 +66,12 @@ if "%DEBUG_BUILD%"=="1" (
 :: +--------------------------------------------------------------+
 echo [Compiling WASM Module...]
 
+:: Increment the BUILD version number
+python %IncVersNumScriptPath% %VersionFilePath%
+for /f "delims=" %%i in ('python %ExtractDefineScriptPath% %VersionFilePath% APP_VERSION_MAJOR') do set APP_VERSION_MAJOR=%%i
+for /f "delims=" %%i in ('python %ExtractDefineScriptPath% %VersionFilePath% APP_VERSION_MINOR') do set APP_VERSION_MINOR=%%i
+for /f "delims=" %%i in ('python %ExtractDefineScriptPath% %VersionFilePath% APP_VERSION_BUILD') do set APP_VERSION_BUILD=%%i
+
 clang %CompilerFlags% %LinkerFlags% -o %OutputWasmModulePath% %MainSourcePath%
 
 IF %ERRORLEVEL% NEQ 0 (
@@ -78,6 +86,6 @@ IF %ERRORLEVEL% NEQ 0 (
 :: +--------------------------------------------------------------+
 echo [Bunding Orca App...]
 
-orca bundle --name %PROJECT_NAME_SAFE% --icon %AppIconPath% --resource-dir %DataFolder% %OutputWasmModulePath%
+orca bundle --name %PROJECT_NAME_SAFE% --icon %AppIconPath% --resource-dir %DataFolder% %OutputWasmModulePath% --version %APP_VERSION_MAJOR%.%APP_VERSION_MINOR%.%APP_VERSION_BUILD% > NUL
 
 echo [Finished Bundling!]

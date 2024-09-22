@@ -9,12 +9,11 @@ Description:
 
 #include <math.h>
 #include <orca.h>
-
-#include "orca_aliases.h"
-#include "orca_addons.h"
-#include "main.h"
-
 #include "build_config.h"
+#include "my_orca.h"
+
+#include "version.h"
+#include "main.h"
 
 OC_Arena_t mainArena;
 AppState_t* app = nullptr;
@@ -28,14 +27,21 @@ rec ScreenRec = Rec_Zero_Const;
 // +==============================+
 EXPORT void OC_OnInit()
 {
-	OC_Log_I("OC_OnInit!");
+	OC_Log_I("%s app v%d.%d(%d) is starting...", PROJECT_NAME_STR, APP_VERSION_MAJOR, APP_VERSION_MINOR, APP_VERSION_BUILD);
 	
 	OC_ArenaInit(&mainArena);
-	
-	OC_WindowSetTitle(NewStr(PROJECT_NAME_STR));
 	app = OC_ArenaPushType(&mainArena, AppState_t);
 	OC_Assert(app != nullptr, "Failed to allocate AppState_t structure!!");
 	memset(app, 0x00, sizeof(AppState_t)); //TODO: Change to ClearPntr?
+	
+	OC_ArenaScope_t scratch = OC_ScratchBegin();
+	
+	#if DEBUG_BUILD
+	MyStr_t windowTitle = OC_Str8Pushf(&mainArena, "%s %d.%d(%d)", PROJECT_NAME_STR, APP_VERSION_MAJOR, APP_VERSION_MINOR, APP_VERSION_BUILD);
+	#else
+	MyStr_t windowTitle = NewStr(PROJECT_NAME_STR);
+	#endif
+	OC_WindowSetTitle(windowTitle);
 	
 	app->renderer = OC_CanvasRendererCreate();
 	app->surface = OC_CanvasSurfaceCreate(app->renderer);
@@ -43,6 +49,8 @@ EXPORT void OC_OnInit()
 	
 	app->pigTexture = OC_ImageCreateFromPath(app->renderer, NewStr("Image/pig_invalid.png"), false);
 	OC_Assert(!OC_ImageIsNil(app->pigTexture), "Failed to load pig_invalid.png!");
+	
+	OC_ScratchEnd(scratch);
 }
 
 //TODO: Should we call OC_ArenaCleanup on mainArena when the application is closing?
