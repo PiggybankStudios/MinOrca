@@ -10,6 +10,10 @@ my_orca folder
 https://www.github.com/PiggybankStudios/gylib
 gylib folder
 
+# nanosvg
+https://github.com/memononen/nanosvg
+nanosvg folder
+
 # Orca (optional, as reference)
 https://www.github.com/orca-app/orca
 orca folder

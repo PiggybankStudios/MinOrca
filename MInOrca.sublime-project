@@ -30,6 +30,17 @@
 			],
 		},
 		{
+			"name": "NanoSVG",
+			"path": "lib/include/nanosvg",
+			"file_exclude_patterns": [
+				"README.md",
+				"CMakeLists.txt",
+				"Config.cmake.in",
+				"premake4.lua",
+				"LICENSE.txt",
+			],
+		},
+		{
 			"name": "Orca Docs",
 			"path": "lib/include/orca/doc/",
 			"folder_exclude_patterns": [

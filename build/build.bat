@@ -46,7 +46,7 @@ set CompilerFlags=%CompilerFlags% -Wl,--no-entry -Wl,--export-dynamic
 :: Include Directories
 :: --sysroot = Set the include directory for standard library headers (like stdint.h)
 :: -I = Add an include directory so search when resolving #include "..." lines
-set CompilerFlags=%CompilerFlags% --sysroot %OrcaSdkPath%/orca-libc -I%OrcaSdkPath%/src -I%OrcaSdkPath%/src/ext -I%LibFolder%/include/my_orca
+set CompilerFlags=%CompilerFlags% --sysroot %OrcaSdkPath%/orca-libc -I%OrcaSdkPath%/src -I%OrcaSdkPath%/src/ext -I%LibFolder%/include/my_orca -I%LibFolder%/include/nanosvg/src
 :: Linker Flags
 :: -L = Add a lib include folder
 :: -lorca_wasm = This is the precompiled binary that we compile with in order to get all the orca API functions exposed to us
@@ -84,7 +84,7 @@ IF %ERRORLEVEL% NEQ 0 (
 :: +--------------------------------------------------------------+
 :: |                   Bundle Orca Application                    |
 :: +--------------------------------------------------------------+
-echo [Bunding Orca App...]
+echo [Bundling Orca App...]
 
 orca bundle --name %PROJECT_NAME_SAFE% --icon %AppIconPath% --resource-dir %DataFolder% %OutputWasmModulePath% --version %APP_VERSION_MAJOR%.%APP_VERSION_MINOR%.%APP_VERSION_BUILD% > NUL
 
