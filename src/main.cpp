@@ -10,17 +10,27 @@ Description:
 #include <math.h>
 #define restrict __restrict
 #include <stdio.h>
+
+// +--------------------------------------------------------------+
+// |                       Library Includes                       |
+// +--------------------------------------------------------------+
 #include <orca.h>
 #include "build_config.h"
+#include "my_orca.h"
 
 #define NANOSVG_IMPLEMENTATION
 #include "nanosvg.h"
 
-#include "my_orca.h"
-
+// +--------------------------------------------------------------+
+// |                         Header Files                         |
+// +--------------------------------------------------------------+
 #include "version.h"
+#include "types.h"
 #include "main.h"
 
+// +--------------------------------------------------------------+
+// |                           Globals                            |
+// +--------------------------------------------------------------+
 OC_Arena_t mainArena;
 AppState_t* app = nullptr;
 v2 MousePos = Vec2_Zero_Const;
@@ -28,16 +38,14 @@ v2 ScreenSize = Vec2_Zero_Const;
 v2i ScreenSizei = Vec2i_Zero_Const;
 rec ScreenRec = Rec_Zero_Const;
 
-colf NewColorfSvg(u32 svgPackedColor)
-{
-	return NewColorfBytes(
-		(u8)((svgPackedColor >> 0) & 0xFF),
-		(u8)((svgPackedColor >> 8) & 0xFF),
-		(u8)((svgPackedColor >> 16) & 0xFF),
-		(u8)((svgPackedColor >> 24) & 0xFF)
-	);
-}
+// +--------------------------------------------------------------+
+// |                         Source Files                         |
+// +--------------------------------------------------------------+
+#include "svg.cpp"
 
+// +--------------------------------------------------------------+
+// |                   Application Entry Points                   |
+// +--------------------------------------------------------------+
 // +==============================+
 // |          OC_OnInit           |
 // +==============================+
@@ -65,19 +73,6 @@ EXPORT void OC_OnInit()
 	
 	app->pigTexture = OC_ImageCreateFromPath(app->renderer, NewStr("Image/pig_invalid.png"), false);
 	OC_Assert(!OC_ImageIsNil(app->pigTexture), "Failed to load pig_invalid.png!");
-	
-	OC_File_t svgFile = OC_FileOpen(NewStr("Vector/blue_shape.svg"), OC_FILE_ACCESS_READ, OC_FILE_OPEN_NONE);
-	OC_Assert(!OC_FileIsNil(svgFile), "Failed to open Vector/blue_shape.svg");
-	u64 svgFileSize = OC_FileSize(svgFile);
-	OC_Assert(svgFileSize > 0, "SVG file failed to open or is empty!");
-	OC_Log_I("svg file is %llu bytes", svgFileSize);
-	MyStr_t svgFileContents = NewStr(svgFileSize, OC_ArenaPushArray(scratch.arena, char, svgFileSize+1));
-	OC_Assert(svgFileContents.chars != nullptr, "Failed to allocate space for %u byte svg file", svgFileSize);
-	OC_FileRead(svgFile, svgFileSize, svgFileContents.chars);
-	svgFileContents.chars[svgFileContents.length] = '\0';
-	app->svgImage = nsvgParse(svgFileContents.chars, "px", 96);
-	OC_Assert(app->svgImage != nullptr, "Failed to parse svg image Vector/blue_shape.svg");
-	OC_FileClose(svgFile);
 	
 	OC_ScratchEnd(scratch);
 }
@@ -149,7 +144,7 @@ EXPORT void OC_OnFrameRefresh()
 	OC_CubicTo(100, 100, MousePos.x, MousePos.y, 200, 100);
 	OC_Stroke();
 	
-	#if 0
+	#if 1
 	// OC_Log_I("shapes: %p %fx%f", app->svgImage->shapes, app->svgImage->width, app->svgImage->height);
 	u32 shapeIndex = 0;
 	for (NSVGshape *shape = app->svgImage->shapes; shape != nullptr; shape = shape->next)
