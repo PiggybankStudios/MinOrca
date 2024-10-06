@@ -9,7 +9,7 @@ Date:   09\29\2024
 
 struct VectorPath_t
 {
-	
+	//TODO: Implement me!
 };
 
 enum VectorFillType_t

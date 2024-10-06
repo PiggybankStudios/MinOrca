@@ -17,6 +17,7 @@ colf NewColorfSvg(u32 svgPackedColor)
 	);
 }
 
+#if 0
 //TODO: Turn the assertions into false returns!
 bool TryLoadVectorImgFromPath(MyStr_t filePath, OC_Arena_t* arena, VectorImg_t* imageOut)
 {
@@ -77,3 +78,4 @@ bool TryLoadVectorImgFromPath(MyStr_t filePath, OC_Arena_t* arena, VectorImg_t* 
 	
 	OC_ScratchEnd(scratch);
 }
+#endif
