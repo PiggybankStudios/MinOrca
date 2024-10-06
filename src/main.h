@@ -19,6 +19,7 @@ struct AppState_t
 	OC_CanvasContext_t canvasContext;
 	OC_Image_t pigTexture;
 	NSVGimage* svgImage;
+	VectorImg_t testVector;
 };
 
 #endif //  _MAIN_H

@@ -1,5 +1,10 @@
 
 # TODO List
+	( ) Does %.*s format specifier still work in Orca? Is the length part of a MyStr_t actually 32-bits?
+	[ ] Finish SVG loading code
+	[ ] Implement AssertFailure function
+	[ ] Add debug functions like I normally have (and implement for GyLib as well)
+	[ ] Implement scratch arenas in Orca
 	[X] Rename the main.c to main.cpp and get things compiling in C++ mode!
 	[X] Write the minimal number of aliases so our program looks a little more like home
 	[X] Get an image loading and rendering
@@ -9,11 +14,11 @@
 	[ ] What happens when we hit a breakpoint in remedybg? In VS? What about exceptions?
 	[ ] Add support for making an application that doesn't spawn a console window (Does the icon of the application window fix itself?)
 	[ ] Make sure all the parameter names are in our naming convention in orca_aliases.h
-	[ ] Add a version number for the application with an auto-incrementing build number!
+	[X] Add a version number for the application with an auto-incrementing build number!
 	[X] Manage our memory a bit better (global struct for app state, allocations from a heap?, etc.)
 	[-] Can we get rid of the resource path printouts when bundling?
 	[ ] Unused variables warning in release builds?
-	[ ] Finish off Vector/Rectangle/Matrix type functions
+	[X] Finish off Vector/Rectangle/Matrix type functions
 	[ ] 
 
 # Questions

@@ -104,6 +104,34 @@ ORCA_EXPORT void OC_OnInit()
 	OC_Assert(app->svgImage != nullptr, "Failed to parse svg image %.*s", svgFilePath.length, svgFilePath.chars);
 	OC_FileClose(svgFile);
 	
+	if (TryLoadVectorImgFromPath(svgFilePath, mainHeap, &app->testVector))
+	{
+		OC_Log_I("Loaded SVG with %llu shape%s:", app->testVector.shapes.length, Plural(app->testVector.shapes.length, "s"));
+		VarArrayLoop(&app->testVector.shapes, sIndex)
+		{
+			VarArrayLoopGet(VectorShape_t, shape, &app->testVector.shapes, sIndex);
+			OC_Log_I("\tShape[%llu]: \"%s\" %llu path%s", sIndex, shape->name.chars, shape->paths.length, Plural(shape->paths.length, "s"));
+			VarArrayLoop(&shape->paths, pIndex)
+			{
+				VarArrayLoopGet(VectorPath_t, path, &shape->paths, pIndex);
+				OC_Log_I("\t\tPath[%llu]: %llu edge%s", pIndex, path->edges.length, Plural(path->edges.length, "s"));
+				VarArrayLoop(&path->edges, eIndex)
+				{
+					VarArrayLoopGet(VectorEdge_t, edge, &path->edges, eIndex);
+					OC_Log_I("\t\t\tEdge[%llu]: (%g,%g) (%g,%g) (%g,%g) (%g,%g)",
+						pIndex,
+						edge->start.x, edge->start.y,
+						edge->control1.x, edge->control1.y,
+						edge->control2.x, edge->control2.y,
+						edge->end.x, edge->end.y
+					);
+					
+				}
+			}
+		}
+	}
+	else { AssertMsg(false, "Failed to load and parse SVG file!"); }
+	
 	OC_ScratchEnd(scratch);
 }
 
