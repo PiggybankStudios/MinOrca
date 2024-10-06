@@ -7,17 +7,14 @@ Description:
 	** All other files are #included from this one (including cpp files!) to keep compilation simple
 */
 
-#include <math.h>
-#define restrict __restrict
-#include <stdio.h>
-
 // +--------------------------------------------------------------+
-// |                       Library Includes                       |
+// |                           Includes                           |
 // +--------------------------------------------------------------+
-#include <orca.h>
 #include "build_config.h"
-// #include "my_orca/my_orca.h"
 
+// +==============================+
+// |          Libraries           |
+// +==============================+
 #define ORCA_COMPILATION
 #define GYLIB_LOOKUP_PRIMES_10
 #include "gylib/gy.h"
@@ -25,37 +22,28 @@ Description:
 #define NANOSVG_IMPLEMENTATION
 #include "nanosvg.h"
 
-// +--------------------------------------------------------------+
-// |                         Header Files                         |
-// +--------------------------------------------------------------+
+// +==============================+
+// |   Application Header Files   |
+// +==============================+
 #include "version.h"
-// #include "types.h"
+#include "types.h"
 #include "main.h"
 
-#if 1
-ORCA_EXPORT void oc_on_init()
-{
-	oc_arena mainArena;
-	oc_arena_init(&mainArena);
-	oc_log_info("%s app v%d.%d(%d) is starting...", PROJECT_NAME_STR, APP_VERSION_MAJOR, APP_VERSION_MINOR, APP_VERSION_BUILD);
-	oc_str8 windowTitle = oc_str8_pushf(&mainArena, "%s %d.%d(%d)", PROJECT_NAME_STR, APP_VERSION_MAJOR, APP_VERSION_MINOR, APP_VERSION_BUILD);
-	oc_window_set_title(windowTitle);
-}
-#else
-// +--------------------------------------------------------------+
-// |                           Globals                            |
-// +--------------------------------------------------------------+
-OC_Arena_t mainArena;
+// +==============================+
+// |     Application Globals      |
+// +==============================+
 AppState_t* app = nullptr;
+MemArena_t* stdHeap;
+MemArena_t* mainHeap;
 v2 MousePos = Vec2_Zero_Const;
 v2 ScreenSize = Vec2_Zero_Const;
 v2i ScreenSizei = Vec2i_Zero_Const;
 rec ScreenRec = Rec_Zero_Const;
 
-// +--------------------------------------------------------------+
-// |                         Source Files                         |
-// +--------------------------------------------------------------+
-// #include "svg.cpp"
+// +==============================+
+// |   Application Source Files   |
+// +==============================+
+#include "svg.cpp"
 
 // +--------------------------------------------------------------+
 // |                   Application Entry Points                   |
@@ -63,19 +51,29 @@ rec ScreenRec = Rec_Zero_Const;
 // +==============================+
 // |          OC_OnInit           |
 // +==============================+
-EXPORT void OC_OnInit()
+ORCA_EXPORT void OC_OnInit()
 {
 	OC_Log_I("%s app v%d.%d(%d) is starting...", PROJECT_NAME_STR, APP_VERSION_MAJOR, APP_VERSION_MINOR, APP_VERSION_BUILD);
 	
-	OC_ArenaInit(&mainArena);
-	app = OC_ArenaPushType(&mainArena, AppState_t);
-	OC_Assert(app != nullptr, "Failed to allocate AppState_t structure!!");
-	memset(app, 0x00, sizeof(AppState_t)); //TODO: Change to ClearPntr?
+	// +==============================+
+	// |   Initialize Memory Arenas   |
+	// +==============================+
+	{
+		MemArena_t stdHeapLocal = {};
+		InitMemArena_StdHeap(&stdHeapLocal);
+		app = AllocStruct(&stdHeapLocal, AppState_t);
+		NotNull(app);
+		ClearPointer(app);
+		MyMemCopy(&app->stdHeap, &stdHeapLocal, sizeof(MemArena_t));
+		stdHeap = &app->stdHeap;
+		InitMemArena_PagedHeapArena(&app->mainHeap, MAIN_HEAP_PAGE_SIZE, stdHeap);
+		mainHeap = &app->mainHeap;
+	}
 	
 	OC_ArenaScope_t scratch = OC_ScratchBegin();
 	
 	#if DEBUG_BUILD
-	MyStr_t windowTitle = OC_Str8Pushf(&mainArena, "%s %d.%d(%d)", PROJECT_NAME_STR, APP_VERSION_MAJOR, APP_VERSION_MINOR, APP_VERSION_BUILD);
+	MyStr_t windowTitle = PrintInArenaStr(mainHeap, "%s %d.%d(%d)", PROJECT_NAME_STR, APP_VERSION_MAJOR, APP_VERSION_MINOR, APP_VERSION_BUILD);
 	#else
 	MyStr_t windowTitle = NewStr(PROJECT_NAME_STR);
 	#endif
@@ -109,12 +107,12 @@ EXPORT void OC_OnInit()
 	OC_ScratchEnd(scratch);
 }
 
-//TODO: Should we call OC_ArenaCleanup on mainArena when the application is closing?
+//TODO: Should we free any memory when the application closes?
 
 // +==============================+
 // |         OC_OnResize          |
 // +==============================+
-EXPORT void OC_OnResize(u32 width, u32 height)
+ORCA_EXPORT void OC_OnResize(u32 width, u32 height)
 {
 	// OC_Log_I("OC_OnResize(%d, %d)!", width, height);
 	ScreenSize = NewVec2((r32)width, (r32)height);
@@ -125,7 +123,7 @@ EXPORT void OC_OnResize(u32 width, u32 height)
 // +==============================+
 // |         OC_OnKeyDown         |
 // +==============================+
-EXPORT void OC_OnKeyDown(OC_ScanCode_t scan, OC_KeyCode_t key)
+ORCA_EXPORT void OC_OnKeyDown(OC_ScanCode_t scan, OC_KeyCode_t key)
 {
 	//TODO: Implement me!
 }
@@ -133,7 +131,7 @@ EXPORT void OC_OnKeyDown(OC_ScanCode_t scan, OC_KeyCode_t key)
 // +==============================+
 // |          OC_OnKeyUp          |
 // +==============================+
-EXPORT void OC_OnKeyUp(OC_ScanCode_t scan, OC_KeyCode_t key)
+ORCA_EXPORT void OC_OnKeyUp(OC_ScanCode_t scan, OC_KeyCode_t key)
 {
 	//TODO: Implement me!
 }
@@ -141,7 +139,7 @@ EXPORT void OC_OnKeyUp(OC_ScanCode_t scan, OC_KeyCode_t key)
 // +==============================+
 // |        OC_OnMouseMove        |
 // +==============================+
-EXPORT void OC_OnMouseMove(float x, float y, float dx, float dy)
+ORCA_EXPORT void OC_OnMouseMove(r32 x, r32 y, r32 dx, r32 dy)
 {
 	MousePos.x = x;
 	MousePos.y = y;
@@ -150,15 +148,15 @@ EXPORT void OC_OnMouseMove(float x, float y, float dx, float dy)
 // +==============================+
 // |      OC_OnFrameRefresh       |
 // +==============================+
-EXPORT void OC_OnFrameRefresh()
+ORCA_EXPORT void OC_OnFrameRefresh()
 {
 	OC_ArenaScope_t scratch = OC_ScratchBegin();
 	
 	OC_CanvasContextSelect(app->canvasContext);
-	OC_SetColorSrgba(NewColorfHex(0xFFCC3B95));
+	OC_SetColor(NewColor(0xFFCC3B95));
 	OC_Clear();
 	
-	OC_SetColorSrgba(NewColorfHex(0xFFFFFFFF));
+	OC_SetColor(NewColor(0xFFFFFFFF));
 	// OC_ImageDraw(app->pigTexture, ScreenRec); //TODO: Color doesn't matter for OC_ImageDraw?
 	OC_SetImage(app->pigTexture);
 	OC_RectangleFill(ScreenRec);
@@ -231,7 +229,7 @@ EXPORT void OC_OnFrameRefresh()
 				OC_ClosePath();
 				if (shape->fill.type == NSVG_PAINT_COLOR)
 				{
-					OC_SetColorSrgba(NewColorfSvg(shape->fill.color));
+					OC_SetColor(NewColorSvg(shape->fill.color));
 					OC_Fill();
 				}
 				
@@ -249,7 +247,7 @@ EXPORT void OC_OnFrameRefresh()
 				OC_ClosePath();
 				if (shape->stroke.type == NSVG_PAINT_COLOR)
 				{
-					OC_SetColorSrgba(NewColorfSvg(shape->stroke.color));
+					OC_SetColor(NewColorSvg(shape->stroke.color));
 					// OC_Log_I("width: %g", shape->strokeWidth);
 					OC_SetWidth(shape->strokeWidth);
 					OC_Stroke();
@@ -262,14 +260,14 @@ EXPORT void OC_OnFrameRefresh()
 	}
 	#endif
 	
-	OC_SetColorSrgba(NewColorfHex(0xFFF27CB1));
+	OC_SetColor(NewColor(0xFFF27CB1));
 	OC_SetImage(app->pigTexture);
 	OC_RoundedRectangleFill(NewRec(MousePos.x, MousePos.y, 100, 200), 25);
 	OC_SetImage(OC_ImageNil());
 	
 	OC_CircleFill(MousePos.x - 50 + 25, MousePos.y - 50 + 25, 50);
 	
-	OC_SetColorSrgba(NewColorfHex(0xFFF83333));
+	OC_SetColor(NewColor(0xFFF83333));
 	OC_SetWidth(20);
 	OC_MoveTo(100, 100);
 	OC_CubicTo(100, 100, MousePos.x, MousePos.y, 200, 100);
@@ -298,4 +296,3 @@ EXPORT void OC_OnFrameRefresh()
 	
 	OC_ScratchEnd(scratch);
 }
-#endif

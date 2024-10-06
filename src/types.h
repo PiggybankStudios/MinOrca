@@ -62,10 +62,10 @@ struct VectorShape_t
 	
 	VectorFillType_t fillType;
 	bool fillOddSections; //fillRule == NSVG_FILLRULE_NONZERO
-	colf fillColor;
+	Color_t fillColor;
 	VectorStrokeType_t strokeType;
 	r32 strokeWidth;
-	colf strokeColor;
+	Color_t strokeColor;
 	float miterLimit;
 	
 	u32 numPaths;

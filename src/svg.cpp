@@ -7,9 +7,9 @@ Description:
 	** using nanosvg to do the parsing work
 */
 
-colf NewColorfSvg(u32 svgPackedColor)
+Color_t NewColorSvg(u32 svgPackedColor)
 {
-	return NewColorfBytes(
+	return NewColor(
 		(u8)((svgPackedColor >> 0) & 0xFF),
 		(u8)((svgPackedColor >> 8) & 0xFF),
 		(u8)((svgPackedColor >> 16) & 0xFF),
