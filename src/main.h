@@ -9,10 +9,10 @@ Date:   09\22\2024
 
 struct AppState_t
 {
-	OC_Surface_t surface;
-	OC_CanvasRenderer_t renderer;
-	OC_CanvasContext_t canvasContext;
-	OC_Image_t pigTexture;
+	// OC_Surface_t surface;
+	// OC_CanvasRenderer_t renderer;
+	// OC_CanvasContext_t canvasContext;
+	// OC_Image_t pigTexture;
 	NSVGimage* svgImage;
 };
 

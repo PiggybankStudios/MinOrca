@@ -16,10 +16,11 @@ Description:
 // +--------------------------------------------------------------+
 #include <orca.h>
 #include "build_config.h"
-#include "my_orca/my_orca.h"
+// #include "my_orca/my_orca.h"
 
-// #define ORCA_COMPILATION
-// #include "gylib/gy.h"
+#define ORCA_COMPILATION
+#define GYLIB_LOOKUP_PRIMES_10
+#include "gylib/gy.h"
 
 #define NANOSVG_IMPLEMENTATION
 #include "nanosvg.h"
@@ -28,9 +29,19 @@ Description:
 // |                         Header Files                         |
 // +--------------------------------------------------------------+
 #include "version.h"
-#include "types.h"
+// #include "types.h"
 #include "main.h"
 
+#if 1
+ORCA_EXPORT void oc_on_init()
+{
+	oc_arena mainArena;
+	oc_arena_init(&mainArena);
+	oc_log_info("%s app v%d.%d(%d) is starting...", PROJECT_NAME_STR, APP_VERSION_MAJOR, APP_VERSION_MINOR, APP_VERSION_BUILD);
+	oc_str8 windowTitle = oc_str8_pushf(&mainArena, "%s %d.%d(%d)", PROJECT_NAME_STR, APP_VERSION_MAJOR, APP_VERSION_MINOR, APP_VERSION_BUILD);
+	oc_window_set_title(windowTitle);
+}
+#else
 // +--------------------------------------------------------------+
 // |                           Globals                            |
 // +--------------------------------------------------------------+
@@ -44,7 +55,7 @@ rec ScreenRec = Rec_Zero_Const;
 // +--------------------------------------------------------------+
 // |                         Source Files                         |
 // +--------------------------------------------------------------+
-#include "svg.cpp"
+// #include "svg.cpp"
 
 // +--------------------------------------------------------------+
 // |                   Application Entry Points                   |
@@ -287,3 +298,4 @@ EXPORT void OC_OnFrameRefresh()
 	
 	OC_ScratchEnd(scratch);
 }
+#endif

@@ -39,6 +39,8 @@ for /f "delims=" %%i in ('python %ExtractDefineScriptPath% %BuildConfigPath% DEB
 :: -D__DEFINED_wchar_t = TODO: Why is this needed?? When compiling in C++ mode, we run into an error:
 ::                             alltypes.h:116:13: error: cannot combine with previous 'int' declaration specifier
 set CompilerFlags=--target=wasm32 -mbulk-memory -std=c++11 -D__DEFINED_wchar_t
+:: -Wno-switch = Disable warning: enumeration values 'ExpOp_None', 'ExpOp_BitwiseNot', and 'ExpOp_NumOps' not handled in switch [-Wswitch]
+set CompilerFlags=%CompilerFlags% -Wno-switch
 :: Linker Flags
 :: -Wl,--no-entry = Allow no entry point in this compilation (Orca will act as the entry point, and it will use our wasm binary when we do orca bundle)
 :: -Wl,--export-dynamic = ?
