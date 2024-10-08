@@ -31,7 +31,7 @@ bool TryLoadVectorImgFromPath(MyStr_t filePath, MemArena_t* memArena, VectorImg_
 		
 		u64 svgFileSize = OC_FileSize(svgFile);
 		AssertMsg(svgFileSize > 0, "SVG file failed to open or is empty!");
-		// OC_Log_I("svg file is %llu bytes", svgFileSize);
+		// PrintLine_I("svg file is %llu bytes", svgFileSize);
 		
 		MyStr_t svgFileContents = NewStr(svgFileSize, OC_ArenaPushArray(scratch.arena, char, svgFileSize+1));
 		AssertMsg(svgFileContents.chars != nullptr, "Failed to allocate space for svg file");

@@ -1,10 +1,10 @@
 
 # TODO List
-	( ) Does %.*s format specifier still work in Orca? Is the length part of a MyStr_t actually 32-bits?
+	(X) Does %.*s format specifier still work in Orca? Is the length part of a MyStr_t actually 32-bits?
 	[ ] Finish SVG loading code
-	[ ] Implement AssertFailure function
-	[ ] Add debug functions like I normally have (and implement for GyLib as well)
-	[ ] Implement scratch arenas in Orca
+	[X] Implement AssertFailure function
+	[X] Add debug functions like I normally have (and implement for GyLib as well)
+	[X] Implement scratch arenas in Orca
 	[X] Rename the main.c to main.cpp and get things compiling in C++ mode!
 	[X] Write the minimal number of aliases so our program looks a little more like home
 	[X] Get an image loading and rendering
