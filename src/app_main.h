@@ -11,6 +11,7 @@ struct AppState_t
 {
 	OC_Image_t pigTexture;
 	VectorImg_t testVector;
+	RandomSeries_t rand;
 	
 	r64 renderTimeLastFrame;
 	r64 presentTimeLastFrame;

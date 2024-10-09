@@ -1,7 +1,7 @@
 
 # TODO List
 	(X) Does %.*s format specifier still work in Orca? Is the length part of a MyStr_t actually 32-bits?
-	[ ] Finish SVG loading code
+	[X] Finish SVG loading code
 	[X] Implement AssertFailure function
 	[X] Add debug functions like I normally have (and implement for GyLib as well)
 	[X] Implement scratch arenas in Orca
@@ -10,15 +10,16 @@
 	[X] Get an image loading and rendering
 	[-] Get a piece of audio loading and rendering (Audio is not supported by Orca yet it seems)
 	[X] Render some sort of vector geometry?
-	[ ] Get timing information and set up TimeScale, etc.
-	[ ] What happens when we hit a breakpoint in remedybg? In VS? What about exceptions?
-	[ ] Add support for making an application that doesn't spawn a console window (Does the icon of the application window fix itself?)
+	[X] Get timing information and set up TimeScale, etc.
+	[?] What happens when we hit a breakpoint in remedybg? In VS? What about exceptions?
+	[?] Add support for making an application that doesn't spawn a console window (Does the icon of the application window fix itself?)
 	[ ] Make sure all the parameter names are in our naming convention in orca_aliases.h
 	[X] Add a version number for the application with an auto-incrementing build number!
 	[X] Manage our memory a bit better (global struct for app state, allocations from a heap?, etc.)
 	[-] Can we get rid of the resource path printouts when bundling?
 	[ ] Unused variables warning in release builds?
 	[X] Finish off Vector/Rectangle/Matrix type functions
+	[ ] Finish setting up oc_input_api.cpp (including mouse hit testing and capturing)
 	[ ] 
 
 # Questions

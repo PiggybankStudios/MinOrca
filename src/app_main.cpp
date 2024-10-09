@@ -38,6 +38,9 @@ void AppInit()
 		DebugPrintVectorImg(&app->testVector, DbgLevel_Debug);
 	}
 	else { AssertMsg(false, "Failed to load and parse SVG file!"); }
+	
+	CreateRandomSeries(&app->rand);
+	SeedRandomSeriesU64(&app->rand, (u64)OC_ClockTime(OC_CLOCK_DATE));
 }
 
 // +--------------------------------------------------------------+
@@ -47,6 +50,12 @@ void AppUpdateAndRender()
 {
 	r64 renderStartTime = OC_ClockTime(OC_CLOCK_MONOTONIC);
 	MemArena_t* scratch = GetScratchArena();
+	
+	if (MousePressed(MouseBtn_Middle))
+	{
+		HandleMouseExtended(MouseBtn_Middle);
+		app->sliderValue = GetRandR32(&app->rand);
+	}
 	
 	OC_UiSetContext(&platform->ui);
 	OC_CanvasContextSelect(platform->canvasContext);
