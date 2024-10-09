@@ -1,4 +1,5 @@
 build/*
+engine/
 !build/build.bat
 lib/include/*
 !lib/include/README.md

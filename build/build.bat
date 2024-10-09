@@ -19,11 +19,12 @@ for /f "tokens=5" %%i in ('orca version') do set OrcaVersion=%%i
 echo Orca Version: %OrcaVersion%
 
 set SourceFolder=../src
+set EngineFolder=../engine
 set DataFolder=../data
 set LibFolder=../lib
 set AppIconPath=%DataFolder%/icon.png
 set OutputWasmModulePath=module.wasm
-set MainSourcePath=%SourceFolder%/main.cpp
+set MainSourcePath=%EngineFolder%/platform/orca/oc_main.cpp
 set BuildConfigPath=%SourceFolder%/build_config.h
 set VersionFilePath=%SourceFolder%/version.h
 set ExtractDefineScriptPath=%LibFolder%/include/gylib/ExtractDefine.py
@@ -52,7 +53,7 @@ set CompilerFlags=%CompilerFlags% -Wl,--no-entry -Wl,--export-dynamic
 :: Include Directories
 :: --sysroot = Set the include directory for standard library headers (like stdint.h)
 :: -I = Add an include directory so search when resolving #include "..." lines
-set CompilerFlags=%CompilerFlags% --sysroot %OrcaSdkPath%/orca-libc -I%OrcaSdkPath%/src -I%OrcaSdkPath%/src/ext -I%LibFolder%/include -I%LibFolder%/include/nanosvg/src
+set CompilerFlags=%CompilerFlags% --sysroot %OrcaSdkPath%/orca-libc -I%SourceFolder% -I%EngineFolder%/platform/orca -I%OrcaSdkPath%/src -I%OrcaSdkPath%/src/ext -I%LibFolder%/include -I%LibFolder%/include/nanosvg/src
 :: Linker Flags
 :: -L = Add a lib include folder
 :: -lorca_wasm = This is the precompiled binary that we compile with in order to get all the orca API functions exposed to us
