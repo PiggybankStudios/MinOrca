@@ -102,48 +102,10 @@ ORCA_EXPORT void OC_OnInit()
 	app->debugFont = OC_FontCreateFromPath(NewStr("Font/consolab.ttf"), ArrayCount(fontRanges), fontRanges);
 	
 	MyStr_t svgFilePath = NewStr("Vector/blue_shape.svg");
-	OC_File_t svgFile = OC_FileOpen(svgFilePath, OC_FILE_ACCESS_READ, OC_FILE_OPEN_NONE);
-	OC_Assert(!OC_FileIsNil(svgFile), "Failed to open %.*s", svgFilePath.length, svgFilePath.chars);
-	
-	u64 svgFileSize = OC_FileSize(svgFile);
-	OC_Assert(svgFileSize > 0, "SVG file failed to open or is empty!");
-	// PrintLine_I("svg file is %llu bytes", svgFileSize);
-	
-	MyStr_t svgFileContents = NewStr(svgFileSize, AllocArray(scratch, char, svgFileSize+1));
-	OC_Assert(svgFileContents.chars != nullptr, "Failed to allocate space for %u byte svg file", svgFileSize);
-	u64 readResult = OC_FileRead(svgFile, svgFileSize, svgFileContents.chars);
-	//TODO: Assert on readResult?
-	svgFileContents.chars[svgFileContents.length] = '\0';
-	
-	app->svgImage = nsvgParse(svgFileContents.chars, "px", 96);
-	OC_Assert(app->svgImage != nullptr, "Failed to parse svg image %.*s", svgFilePath.length, svgFilePath.chars);
-	OC_FileClose(svgFile);
-	
 	if (TryLoadVectorImgFromPath(svgFilePath, mainHeap, &app->testVector))
 	{
 		PrintLine_I("Loaded SVG with %llu shape%s:", app->testVector.shapes.length, Plural(app->testVector.shapes.length, "s"));
-		VarArrayLoop(&app->testVector.shapes, sIndex)
-		{
-			VarArrayLoopGet(VectorShape_t, shape, &app->testVector.shapes, sIndex);
-			PrintLine_I("\tShape[%llu]: \"%s\" %llu path%s", sIndex, shape->name.chars, shape->paths.length, Plural(shape->paths.length, "s"));
-			VarArrayLoop(&shape->paths, pIndex)
-			{
-				VarArrayLoopGet(VectorPath_t, path, &shape->paths, pIndex);
-				PrintLine_I("\t\tPath[%llu]: %llu edge%s", pIndex, path->edges.length, Plural(path->edges.length, "s"));
-				VarArrayLoop(&path->edges, eIndex)
-				{
-					VarArrayLoopGet(VectorEdge_t, edge, &path->edges, eIndex);
-					PrintLine_I("\t\t\tEdge[%llu]: (%g,%g) (%g,%g) (%g,%g) (%g,%g)",
-						pIndex,
-						edge->start.x, edge->start.y,
-						edge->control1.x, edge->control1.y,
-						edge->control2.x, edge->control2.y,
-						edge->end.x, edge->end.y
-					);
-					
-				}
-			}
-		}
+		DebugPrintVectorImg(&app->testVector, DbgLevel_Debug);
 	}
 	else { AssertMsg(false, "Failed to load and parse SVG file!"); }
 	
@@ -207,7 +169,7 @@ ORCA_EXPORT void OC_OnMouseMove(r32 x, r32 y, r32 dx, r32 dy)
 // +==============================+
 ORCA_EXPORT void OC_OnFrameRefresh()
 {
-	// r64 renderStartTime = OC_ClockTime(OC_CLOCK_MONOTONIC);
+	r64 renderStartTime = OC_ClockTime(OC_CLOCK_MONOTONIC);
 	MemArena_t* scratch = GetScratchArena();
 	
 	OC_UiSetContext(&app->ui);
@@ -222,21 +184,7 @@ ORCA_EXPORT void OC_OnFrameRefresh()
 	OC_RectangleFill(ScreenRec);
 	#endif
 	
-	// OC_UiSetTheme(&OC_UI_DARK_THEME);
-	// oc_ui_box_size size;
-	// oc_ui_layout layout;
-	// oc_ui_box_floating floating;
-	// oc_vec2 floatTarget;
-	// oc_color color;
-	// oc_color bgColor;
-	// oc_color borderColor;
-	// oc_font font;
-	// f32 fontSize;
-	// f32 borderSize;
-	// f32 roundness;
-	// f32 animationTime;
-	// oc_ui_style_mask animationMask;
-	#if 0
+	#if 1
 	OC_UiStyle_t uiStyle = {};
 	uiStyle.font = app->debugFont;
 	OC_UiFrame(ScreenSize, &uiStyle, OC_UI_STYLE_FONT)
@@ -245,115 +193,25 @@ ORCA_EXPORT void OC_OnFrameRefresh()
 		{
 			OC_UiMenu("Test")
 			{
-				OC_UiSetNextWidth(200, OC_UI_SIZE_PIXELS);
-				OC_UiSlider("test_slider", &app->testValue);
 				if (OC_UiMenuButton("Quit").pressed)
 				{
 					OC_RequestQuit();
 				}
 			}
+			
+		}
+		
+		OC_UiSetNextWidth(200, OC_UI_SIZE_PIXELS);
+		OC_UiSlider("test_slider", &app->sliderValue);
+		
+		if (OC_UiButton("Commit!").pressed)
+		{
+			WriteLine_I("Clicked commit!");
 		}
 	}
 	#endif
 	
-	#if 0
-	// PrintLine_I("shapes: %p %fx%f", app->svgImage->shapes, app->svgImage->width, app->svgImage->height);
-	OC_SetImage(OC_ImageNil());
-	u32 shapeIndex = 0;
-	for (NSVGshape *shape = app->svgImage->shapes; shape != nullptr; shape = shape->next)
-	{
-		// PrintLine_I("Drawing shape[%u]", shapeIndex);
-		u32 pathIndex = 0;
-		for (NSVGpath *path = shape->paths; path != nullptr; path = path->next)
-		{
-			if (path->npts > 0)
-			{
-				// PrintLine_I("\tDrawing path[%u]", pathIndex);
-				for (int pIndex = 0; pIndex < path->npts-1; pIndex += 3)
-				{
-					float* pointsPntr = &path->pts[pIndex*2];
-					v2 start = NewVec2(pointsPntr[0], pointsPntr[1]);
-					v2 control1 = NewVec2(pointsPntr[2], pointsPntr[3]);
-					v2 control2 = NewVec2(pointsPntr[4], pointsPntr[5]);
-					v2 end = NewVec2(pointsPntr[6], pointsPntr[7]);
-					if (pIndex == 0) { OC_MoveTo(start); }
-					if (start == control1)
-					{
-						// PrintLine_I("\t\tDrawing quadratic1[%u] (%g, %g) (%g, %g) (%g, %g) (%g, %g)",
-						// 	pIndex/3,
-						// 	start.x, start.y,
-						// 	control1.x, control1.y,
-						// 	control2.x, control2.y,
-						// 	end.x, end.y
-						// );
-						OC_QuadraticTo(
-							control2,
-							end
-						);
-					}
-					else if (control2 == end)
-					{
-						// PrintLine_I("\t\tDrawing quadratic2[%u] (%g, %g) (%g, %g) (%g, %g) (%g, %g)",
-						// 	pIndex/3,
-						// 	start.x, start.y,
-						// 	control1.x, control1.y,
-						// 	control2.x, control2.y,
-						// 	end.x, end.y
-						// );
-						OC_QuadraticTo(
-							control1,
-							end
-						);
-					}
-					else
-					{
-						// PrintLine_I("\t\tDrawing cubic[%u] (%g, %g) (%g, %g) (%g, %g) (%g, %g)",
-						// 	pIndex/3,
-						// 	start.x, start.y,
-						// 	control1.x, control1.y,
-						// 	control2.x, control2.y,
-						// 	end.x, end.y
-						// );
-						OC_CubicTo(
-							control1.x, control1.y,
-							control2.x, control2.y,
-							end.x, end.y
-						);
-					}
-				}
-				OC_ClosePath();
-				if (shape->fill.type == NSVG_PAINT_COLOR)
-				{
-					OC_SetColor(NewColorSvg(shape->fill.color));
-					OC_Fill();
-				}
-				
-				for (int pIndex = 0; pIndex < path->npts-1; pIndex += 3)
-				{
-					float* pointsPntr = &path->pts[pIndex*2];
-					if (pIndex == 0) { OC_MoveTo(pointsPntr[0], pointsPntr[1]); }
-					// PrintLine_I("\t\tDrawing curve[%u]", pIndex/3);
-					OC_CubicTo(
-						pointsPntr[2], pointsPntr[3],
-						pointsPntr[4], pointsPntr[5],
-						pointsPntr[6], pointsPntr[7]
-					);
-				}
-				OC_ClosePath();
-				if (shape->stroke.type == NSVG_PAINT_COLOR)
-				{
-					OC_SetColor(NewColorSvg(shape->stroke.color));
-					// PrintLine_I("width: %g", shape->strokeWidth);
-					OC_SetWidth(shape->strokeWidth);
-					OC_Stroke();
-				}
-			}
-			pathIndex++;
-		}
-		
-		shapeIndex++;
-	}
-	#endif
+	RenderVectorImg(&app->testVector, NewVec2(0, 0), NewVec2(1, 1), White);
 	
 	#if 1
 	OC_SetColor(NewColor(0xFFF27CB1));
@@ -377,6 +235,7 @@ ORCA_EXPORT void OC_OnFrameRefresh()
 	OC_TextFill(10,  25, PrintInArenaStr(scratch, "   Monotonic:    %f", OC_ClockTime(OC_CLOCK_MONOTONIC)));
 	OC_TextFill(10,  50, PrintInArenaStr(scratch, "      Uptime:    %f", OC_ClockTime(OC_CLOCK_UPTIME)));
 	OC_TextFill(10,  75, PrintInArenaStr(scratch, "        Date: %f", OC_ClockTime(OC_CLOCK_DATE)));
+	OC_TextFill(10, 100, PrintInArenaStr(scratch, "Orca Version: %s", ORCA_VERSION));
 	OC_TextFill(10, 125, PrintInArenaStr(scratch, " Render Time: %.2fms", app->renderTimeLastFrame * 1000));
 	OC_TextFill(10, 150, PrintInArenaStr(scratch, "Present Time: %.2fms", app->presentTimeLastFrame * 1000));
 	OC_TextFill(10, 200, PrintInArenaStr(scratch, "Mouse: (%.2f, %.2f)", MousePos.x, MousePos.y));
@@ -396,18 +255,18 @@ ORCA_EXPORT void OC_OnFrameRefresh()
 	// oc_set_width(18.8f);
 	// oc_stroke();
 	
-	// OC_UiDraw();
+	OC_UiDraw();
 	
-	// r64 renderEndTime = OC_ClockTime(OC_CLOCK_MONOTONIC);
-	// r64 presentStartTime = OC_ClockTime(OC_CLOCK_MONOTONIC);
+	r64 renderEndTime = OC_ClockTime(OC_CLOCK_MONOTONIC);
+	r64 presentStartTime = OC_ClockTime(OC_CLOCK_MONOTONIC);
 	OC_CanvasRender(app->renderer, app->canvasContext, app->surface);
 	OC_CanvasPresent(app->renderer, app->surface);
-	// r64 presentEndTime = OC_ClockTime(OC_CLOCK_MONOTONIC);
+	r64 presentEndTime = OC_ClockTime(OC_CLOCK_MONOTONIC);
 	
 	FreeScratchArena(scratch);
 	
-	// app->renderTimeLastFrame = renderEndTime - renderStartTime;
-	// app->presentTimeLastFrame = presentEndTime - presentStartTime;
+	app->renderTimeLastFrame = renderEndTime - renderStartTime;
+	app->presentTimeLastFrame = presentEndTime - presentStartTime;
 }
 
 void GyLibAssertFailure(const char* filePath, int lineNumber, const char* funcName, const char* expressionStr, const char* messageStr)

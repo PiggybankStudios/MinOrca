@@ -124,3 +124,77 @@ bool TryLoadVectorImgFromPath(MyStr_t filePath, MemArena_t* memArena, VectorImg_
 	//TODO: Turn the assertions into false returns!
 	return true;
 }
+
+void DebugPrintVectorImg(const VectorImg_t* image, DbgLevel_t dbgLevel)
+{
+	PrintLineAt(dbgLevel, "%llu shape%s:", image->shapes.length, Plural(image->shapes.length, "s"));
+	VarArrayLoop(&image->shapes, sIndex)
+	{
+		VarArrayLoopGet(VectorShape_t, shape, &image->shapes, sIndex);
+		PrintLineAt(dbgLevel, "\tShape[%llu]: \"%s\" %llu path%s", sIndex, shape->name.chars, shape->paths.length, Plural(shape->paths.length, "s"));
+		VarArrayLoop(&shape->paths, pIndex)
+		{
+			VarArrayLoopGet(VectorPath_t, path, &shape->paths, pIndex);
+			PrintLineAt(dbgLevel, "\t\tPath[%llu]: %llu edge%s", pIndex, path->edges.length, Plural(path->edges.length, "s"));
+			VarArrayLoop(&path->edges, eIndex)
+			{
+				VarArrayLoopGet(VectorEdge_t, edge, &path->edges, eIndex);
+				PrintLineAt(dbgLevel, "\t\t\tEdge[%llu]: (%g,%g) (%g,%g) (%g,%g) (%g,%g)",
+					pIndex,
+					edge->start.x, edge->start.y,
+					edge->control1.x, edge->control1.y,
+					edge->control2.x, edge->control2.y,
+					edge->end.x, edge->end.y
+				);
+				
+			}
+		}
+	}
+}
+
+void TraceVectorPath(const VectorPath_t* path, v2 position, v2 scale)
+{
+	VarArrayLoop(&path->edges, eIndex)
+	{
+		VarArrayLoopGet(VectorEdge_t, edge, &path->edges, eIndex);
+		v2 start    = position + Vec2Multiply(edge->start,    scale);
+		v2 control1 = position + Vec2Multiply(edge->control1, scale);
+		v2 control2 = position + Vec2Multiply(edge->control2, scale);
+		v2 end      = position + Vec2Multiply(edge->end,      scale);
+		if (eIndex == 0) { OC_MoveTo(start); }
+		if (start == control1) { OC_QuadraticTo(control2, end); }
+		else if (control2 == end) { OC_QuadraticTo(control1, end); }
+		else { OC_CubicTo(control1, control2, end); }
+	}
+	OC_ClosePath();
+}
+
+void RenderVectorImg(const VectorImg_t* image, v2 position, v2 scale, Color_t color)
+{
+	VarArrayLoop(&image->shapes, sIndex)
+	{
+		VarArrayLoopGet(VectorShape_t, shape, &image->shapes, sIndex);
+		VarArrayLoop(&shape->paths, pIndex)
+		{
+			VarArrayLoopGet(VectorPath_t, path, &shape->paths, pIndex);
+			
+			if (shape->fillType == VectorFillType_Solid)
+			{
+				TraceVectorPath(path, position, scale);
+				OC_SetImage(OC_ImageNil());
+				OC_SetColor(shape->fillColor);
+				OC_Fill();
+			}
+			
+			if (shape->strokeType == VectorStrokeType_Solid)
+			{
+				TraceVectorPath(path, position, scale);
+				OC_SetImage(OC_ImageNil());
+				OC_SetColor(shape->strokeColor);
+				OC_SetWidth(shape->strokeWidth);
+				OC_SetMaxJointExcursion(shape->miterLimit);
+				OC_Stroke();
+			}
+		}
+	}
+}

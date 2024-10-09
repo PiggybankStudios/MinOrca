@@ -19,13 +19,12 @@ struct AppState_t
 	
 	OC_Image_t pigTexture;
 	OC_Font_t debugFont;
-	NSVGimage* svgImage;
 	VectorImg_t testVector;
 	
 	r64 renderTimeLastFrame;
 	r64 presentTimeLastFrame;
 	
-	r32 testValue;
+	r32 sliderValue;
 };
 
 #endif //  _MAIN_H

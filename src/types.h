@@ -64,7 +64,7 @@ struct VectorShape_t
 	VectorStrokeType_t strokeType;
 	r32 strokeWidth;
 	Color_t strokeColor;
-	float miterLimit;
+	r32 miterLimit;
 	
 	VarArray_t paths; //VectorPath_t
 };

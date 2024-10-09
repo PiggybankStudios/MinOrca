@@ -13,6 +13,10 @@ if %ERRORLEVEL% NEQ 0 (
 :: |                      Paths and Options                       |
 :: +--------------------------------------------------------------+
 for /f %%i in ('orca sdk-path') do set OrcaSdkPath=%%i
+REM NOTE: orca version prints out 2 lines, second line is like: "Orca active SDK version: dev-b594781"
+for /f "tokens=5" %%i in ('orca version') do set OrcaVersion=%%i
+
+echo Orca Version: %OrcaVersion%
 
 set SourceFolder=../src
 set DataFolder=../data
@@ -38,7 +42,7 @@ for /f "delims=" %%i in ('python %ExtractDefineScriptPath% %BuildConfigPath% DEB
 :: -std=c++11 = ?
 :: -D__DEFINED_wchar_t = TODO: Why is this needed?? When compiling in C++ mode, we run into an error:
 ::                             alltypes.h:116:13: error: cannot combine with previous 'int' declaration specifier
-set CompilerFlags=--target=wasm32 -mbulk-memory -std=c++11 -D__DEFINED_wchar_t
+set CompilerFlags=--target=wasm32 -mbulk-memory -std=c++11 -D__DEFINED_wchar_t -DORCA_VERSION=\"%OrcaVersion%\"
 :: -Wno-switch = Disable warning: enumeration values 'ExpOp_None', 'ExpOp_BitwiseNot', and 'ExpOp_NumOps' not handled in switch [-Wswitch]
 set CompilerFlags=%CompilerFlags% -Wno-switch
 :: Linker Flags
